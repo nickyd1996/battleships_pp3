@@ -11,10 +11,6 @@ credentials = Credentials.from_service_account_file(CREDS_FILE, scopes=SCOPE)
 client = gspread.authorize(credentials)
 sheet = client.open(SPREADSHEET_NAME).sheet1
 
-credentials = Credentials.from_service_account_file(CREDS_FILE, scopes=SCOPE)
-client = gspread.authorize(credentials)
-sheet = client.open(SPREADSHEET_NAME).sheet1
-
 # Initialize the board
 def initialize_board():
     return [['O' for _ in range(5)] for _ in range(5)]
