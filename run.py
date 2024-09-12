@@ -11,32 +11,37 @@ credentials = Credentials.from_service_account_file(CREDS_FILE, scopes=SCOPE)
 client = gspread.authorize(credentials)
 sheet = client.open(SPREADSHEET_NAME).sheet1
 
+credentials = Credentials.from_service_account_file(CREDS_FILE, scopes=SCOPE)
+client = gspread.authorize(credentials)
+sheet = client.open(SPREADSHEET_NAME).sheet1
+
 # Initialize the board
 def initialize_board():
-    # Create a 5x5 grid
-    board = [['O' for _ in range(5)] for _ in range(5)]
-    return board
-	
+    return [['O' for _ in range(5)] for _ in range(5)]
+
 # Print the board
 def print_board(board):
     for row in board:
         print(" ".join(row))
+
+# Display the player's and computer's boards side by side
+def display_boards(player_board, computer_board):
+    print("\nPlayer's Board         Computer's Board")
+    print("----------------      -----------------")
+    for i in range(5):
+        # Display player and computer boards in two columns
+        print(" ".join(player_board[i]) + "        " + " ".join(computer_board[i]))
 
 # Place the ship randomly on the board
 def place_ship():
     return random.randint(0, 4), random.randint(0, 4)
 
 # Update board in Google Sheet
-def update_sheet(board):
+def update_sheet(board, sheet_range):
     for i in range(5):
-        sheet.update(f'A{i+1}:E{i+1}', [board[i]])
+        sheet.update(f'{sheet_range}{i+1}:{chr(ord(sheet_range)+4)}{i+1}', [board[i]])
 
-# Read board from Google Sheet 
-def read_board_from_sheet():
-    board_data = sheet.get('A1:E5')
-    return board_data
-
-# Get valid input from the user 
+# Get valid input from the user (Bug Fix)
 def get_valid_input(prompt):
     while True:
         try:
@@ -48,47 +53,83 @@ def get_valid_input(prompt):
         except ValueError:
             print("Invalid input. Please enter a valid integer.")
 
-# Game logic for Battleships
+# Random guess for computer player
+def computer_guess():
+    return random.randint(0, 4), random.randint(0, 4)
+
+# Game logic for Battleships (Player vs Computer)
 def play_game():
-    print("Welcome to Battleships!")
-    
-    board = initialize_board()  # Initialize a blank board
-    ship_row, ship_col = place_ship()  # Place a random ship
-    
-    # Save initial board state to Google Sheets
-    update_sheet(board)
-    
+    print("Welcome to Battleships: Player vs Computer!")
+
+    # Initialize boards
+    player_board = initialize_board()  # Player's guesses
+    computer_board = initialize_board()  # Computer's guesses
+    player_ship_board = initialize_board()  # Player's ship
+    computer_ship_board = initialize_board()  # Computer's ship
+
+    # Place ships
+    player_ship_row, player_ship_col = place_ship()  # Player's ship
+    computer_ship_row, computer_ship_col = place_ship()  # Computer's ship
+
+    # Mark the player's ship on the player board (not shown to the computer)
+    player_ship_board[player_ship_row][player_ship_col] = "S"
+
+    # Update initial boards to Google Sheets
+    update_sheet(player_board, 'A')  # Player's guesses
+    update_sheet(computer_board, 'G')  # Computer's guesses
+    update_sheet(player_ship_board, 'M')  # Player's ship
+    update_sheet(computer_ship_board, 'S')  # Computer's ship
+
     # Maximum guesses allowed
     max_turns = 5
 
     for turn in range(max_turns):
         print(f"\nTurn {turn + 1} of {max_turns}")
-        print_board(board)
-        
-        # Get player's guess
-        guess_row = int(input("Guess Row (0-4): "))
-        guess_col = int(input("Guess Col (0-4): "))
-        
-        # Check if the guess is correct
-        if guess_row == ship_row and guess_col == ship_col:
-            print("Congratulations! You sunk my battleship!")
-            board[guess_row][guess_col] = "X"
-            update_sheet(board)  # Update the board in Google Sheets
+
+        # Show current board state
+        display_boards(player_board, computer_board)
+
+        # --- Player's Turn ---
+        print("Your turn:")
+        guess_row = get_valid_input("Guess Row (0-4): ")
+        guess_col = get_valid_input("Guess Col (0-4): ")
+
+        # Check if the player's guess is correct
+        if guess_row == computer_ship_row and guess_col == computer_ship_col:
+            print("Congratulations! You sunk the computer's battleship!")
+            player_board[guess_row][guess_col] = "X"
+            update_sheet(player_board, 'A')
             break
         else:
-            if 0 <= guess_row <= 4 and 0 <= guess_col <= 4:
-                if board[guess_row][guess_col] == "X":
-                    print("You already guessed that spot!")
-                else:
-                    print("You missed!")
-                    board[guess_row][guess_col] = "X"
-                    update_sheet(board)  # Update the board in Google Sheets
+            if player_board[guess_row][guess_col] == "X":
+                print("You already guessed that spot!")
             else:
-                print("That's not even in the ocean!")
-        
+                print("You missed!")
+                player_board[guess_row][guess_col] = "X"
+                update_sheet(player_board, 'A')
+
+        # --- Computer's Turn ---
+        print("Computer's turn...")
+        comp_guess_row, comp_guess_col = computer_guess()
+
+        # Check if the computer's guess is correct
+        if comp_guess_row == player_ship_row and comp_guess_col == player_ship_col:
+            print("The computer sunk your battleship!")
+            computer_board[comp_guess_row][comp_guess_col] = "X"
+            update_sheet(computer_board, 'G')
+            break
+        else:
+            if computer_board[comp_guess_row][comp_guess_col] == "X":
+                print("Computer guessed the same spot again!")
+            else:
+                print("Computer missed!")
+                computer_board[comp_guess_row][comp_guess_col] = "X"
+                update_sheet(computer_board, 'G')
+
+        # Check if it's the last turn
         if turn == max_turns - 1:
-            print("Game over! You ran out of turns.")
-            print(f"The ship was at: ({ship_row}, {ship_col})")
+            print(f"Game over! The computer's ship was at ({computer_ship_row}, {computer_ship_col})")
+            print(f"Your ship was at ({player_ship_row}, {player_ship_col})")
 
 # Run the game
 if __name__ == '__main__':
