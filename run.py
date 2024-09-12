@@ -11,10 +11,14 @@ credentials = Credentials.from_service_account_file(CREDS_FILE, scopes=SCOPE)
 client = gspread.authorize(credentials)
 sheet = client.open(SPREADSHEET_NAME).sheet1
 
-#initialize the board
+# Initialize the board
 def initialize_board():
-    return [['O' for _ in range(5)] for _ in range(5)]
-
+    # Create a 5x5 grid
+    board = [['O' for _ in range(5)] for _ in range(5)]
+    return board
+	
+# Print the board
 def print_board(board):
     for row in board:
         print(" ".join(row))
+
