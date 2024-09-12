@@ -44,3 +44,11 @@ def play_game():
         guess_row = int(input("Guess Row (0-4): "))
         guess_col = int(input("Guess Col (0-4): "))
         # Check if guess is correct and continue the game logic
+
+#Check if the guess matches the ships location
+if guess_row == ship_row and guess_col == ship_col:
+    print("Congratulations! You sunk my battleship!")
+    break
+else:
+    if turn == max_turns - 1:
+        print(f"Game over! The ship was at ({ship_row}, {ship_col})")
