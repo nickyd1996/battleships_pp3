@@ -1,6 +1,7 @@
 import gspread
 from google.oauth2.service_account import Credentials
 import random
+import sys
 
 # Google Sheets setup
 SCOPE = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
@@ -66,7 +67,7 @@ def all_ships_sunk(ships, board):
 
 # Game logic for Battleships (Player vs Computer)
 def play_game():
-    print("Welcome to Battleships: Player vs Computer!")
+    print("Starting the Battleships game: Player vs Computer!")
 
     # Initialize boards
     player_board = initialize_board()  # Player's guesses
@@ -88,12 +89,8 @@ def play_game():
     update_sheet(player_ship_board, 'M')  # Player's ships
     update_sheet(computer_ship_board, 'S')  # Computer's ships
 
-    # Maximum guesses allowed
-    max_turns = 5
-
-    for turn in range(max_turns):
-        print(f"\nTurn {turn + 1} of {max_turns}")
-
+    # Loop until one player wins (all ships of one side are sunk)
+    while True:
         # Show current board state
         display_boards(player_board, computer_board)
 
@@ -142,12 +139,38 @@ def play_game():
             print("The computer sunk all your ships!")
             break
 
-        # Check if it's the last turn
-        if turn == max_turns - 1:
-            print("Game over!")
-            print(f"The computer's ships were at: {computer_ships}")
-            print(f"Your ships were at: {player_ships}")
-            
-# Run the game
+# Function to display the game rules
+def display_rules():
+    print("""
+    --- Battleships Game Rules ---
+    1. Both the player and the computer have 3 ships hidden on a 5x5 grid.
+    2. The goal is to sink all of the opponent's ships before they sink yours.
+    3. On your turn, enter the row and column you want to attack (0 to 4).
+    4. If you hit an opponent's ship, it's marked with 'X' on your guessing board.
+    5. The game continues until all ships are sunk.
+    """)
+
+# Starting menu
+def start_menu():
+    while True:
+        print("\nWelcome to Battleships!")
+        print("1. Read Rules")
+        print("2. Start Game")
+        print("3. Quit")
+        choice = input("Enter your choice (1, 2, or 3): ")
+
+        if choice == "1":
+            display_rules()
+        elif choice == "2":
+            play_game()
+            break
+        elif choice == "3":
+            print("Thanks for playing! Goodbye.")
+            sys.exit()
+        else:
+            print("Invalid input, please enter 1, 2, or 3.")
+
+# Run the menu
 if __name__ == '__main__':
-    play_game()
+    start_menu()
+    
