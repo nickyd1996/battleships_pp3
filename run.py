@@ -28,9 +28,13 @@ def display_boards(player_board, computer_board):
         # Display player and computer boards in two columns
         print(" ".join(player_board[i]) + "        " + " ".join(computer_board[i]))
 
-# Place the ship randomly on the board
-def place_ship():
-    return random.randint(0, 4), random.randint(0, 4)
+# Place ships randomly on the board
+def place_ships(num_ships=3):
+    ships = set()
+    while len(ships) < num_ships:
+        row, col = random.randint(0, 4), random.randint(0, 4)
+        ships.add((row, col))  # Add unique ship positions
+    return list(ships)
 
 # Update board in Google Sheet
 def update_sheet(board, sheet_range):
@@ -53,6 +57,13 @@ def get_valid_input(prompt):
 def computer_guess():
     return random.randint(0, 4), random.randint(0, 4)
 
+# Check if all ships are sunk
+def all_ships_sunk(ships, board):
+    for ship_row, ship_col in ships:
+        if board[ship_row][ship_col] != "X":  # Not hit yet
+            return False
+    return True
+
 # Game logic for Battleships (Player vs Computer)
 def play_game():
     print("Welcome to Battleships: Player vs Computer!")
@@ -60,21 +71,22 @@ def play_game():
     # Initialize boards
     player_board = initialize_board()  # Player's guesses
     computer_board = initialize_board()  # Computer's guesses
-    player_ship_board = initialize_board()  # Player's ship
-    computer_ship_board = initialize_board()  # Computer's ship
+    player_ship_board = initialize_board()  # Player's ships
+    computer_ship_board = initialize_board()  # Computer's ships
 
-    # Place ships
-    player_ship_row, player_ship_col = place_ship()  # Player's ship
-    computer_ship_row, computer_ship_col = place_ship()  # Computer's ship
+    # Place 3 ships for both the player and the computer
+    player_ships = place_ships(3)  # Player's 3 ships
+    computer_ships = place_ships(3)  # Computer's 3 ships
 
-    # Mark the player's ship on the player board (not shown to the computer)
-    player_ship_board[player_ship_row][player_ship_col] = "S"
+    # Mark the player's ships on the player board (not shown to the computer)
+    for row, col in player_ships:
+        player_ship_board[row][col] = "S"
 
     # Update initial boards to Google Sheets
     update_sheet(player_board, 'A')  # Player's guesses
     update_sheet(computer_board, 'G')  # Computer's guesses
-    update_sheet(player_ship_board, 'M')  # Player's ship
-    update_sheet(computer_ship_board, 'S')  # Computer's ship
+    update_sheet(player_ship_board, 'M')  # Player's ships
+    update_sheet(computer_ship_board, 'S')  # Computer's ships
 
     # Maximum guesses allowed
     max_turns = 5
@@ -90,12 +102,11 @@ def play_game():
         guess_row = get_valid_input("Guess Row (0-4): ")
         guess_col = get_valid_input("Guess Col (0-4): ")
 
-        # Check if the player's guess is correct
-        if guess_row == computer_ship_row and guess_col == computer_ship_col:
-            print("Congratulations! You sunk the computer's battleship!")
+        # Check if the player's guess hits any of the computer's ships
+        if (guess_row, guess_col) in computer_ships:
+            print("Hit! You sunk part of the computer's ship!")
             player_board[guess_row][guess_col] = "X"
             update_sheet(player_board, 'A')
-            break
         else:
             if player_board[guess_row][guess_col] == "X":
                 print("You already guessed that spot!")
@@ -104,16 +115,20 @@ def play_game():
                 player_board[guess_row][guess_col] = "X"
                 update_sheet(player_board, 'A')
 
+        # Check if player sunk all computer's ships
+        if all_ships_sunk(computer_ships, player_board):
+            print("Congratulations! You sunk all the computer's ships!")
+            break
+
         # --- Computer's Turn ---
         print("Computer's turn...")
         comp_guess_row, comp_guess_col = computer_guess()
 
-        # Check if the computer's guess is correct
-        if comp_guess_row == player_ship_row and comp_guess_col == player_ship_col:
-            print("The computer sunk your battleship!")
+        # Check if the computer's guess hits any of the player's ships
+        if (comp_guess_row, comp_guess_col) in player_ships:
+            print("The computer hit your ship!")
             computer_board[comp_guess_row][comp_guess_col] = "X"
             update_sheet(computer_board, 'G')
-            break
         else:
             if computer_board[comp_guess_row][comp_guess_col] == "X":
                 print("Computer guessed the same spot again!")
@@ -122,11 +137,17 @@ def play_game():
                 computer_board[comp_guess_row][comp_guess_col] = "X"
                 update_sheet(computer_board, 'G')
 
+        # Check if computer sunk all player's ships
+        if all_ships_sunk(player_ships, computer_board):
+            print("The computer sunk all your ships!")
+            break
+
         # Check if it's the last turn
         if turn == max_turns - 1:
-            print(f"Game over! The computer's ship was at ({computer_ship_row}, {computer_ship_col})")
-            print(f"Your ship was at ({player_ship_row}, {player_ship_col})")
-
+            print("Game over!")
+            print(f"The computer's ships were at: {computer_ships}")
+            print(f"Your ships were at: {player_ships}")
+            
 # Run the game
 if __name__ == '__main__':
     play_game()
