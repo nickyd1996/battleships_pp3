@@ -35,3 +35,12 @@ def update_sheet(board):
 def read_board_from_sheet():
     board_data = sheet.get('A1:E5')
     return board_data
+
+#Game logic 
+def play_game():
+    #Max guesses allowed
+    max_turns = 5
+    for turn in range(max_turns):
+        guess_row = int(input("Guess Row (0-4): "))
+        guess_col = int(input("Guess Col (0-4): "))
+        # Check if guess is correct and continue the game logic
