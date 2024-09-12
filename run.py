@@ -23,11 +23,17 @@ def print_board(board):
 
 # Display the player's and computer's boards side by side
 def display_boards(player_board, computer_board):
-    print("\nPlayer's Board         Computer's Board")
-    print("----------------      -----------------")
+    print("\nPlayer's Guessing Board         Computer's Board")
+    print("----------------------      -----------------")
     for i in range(5):
-        # Display player and computer boards in two columns
-        print(" ".join(player_board[i]) + "        " + " ".join(computer_board[i]))
+        print(" ".join(player_board[i]) + "                  " + " ".join(computer_board[i]))
+
+# Display the player's ship board
+def display_player_ship_board(player_ship_board):
+    print("\nPlayer's Ship Board")
+    print("-------------------")
+    for row in player_ship_board:
+        print(" ".join(row))
 
 # Place ships randomly on the board
 def place_ships(num_ships=3):
@@ -40,7 +46,8 @@ def place_ships(num_ships=3):
 # Update board in Google Sheet
 def update_sheet(board, sheet_range):
     for i in range(5):
-        sheet.update(f'{sheet_range}{i+1}:{chr(ord(sheet_range)+4)}{i+1}', [board[i]])
+        # Change the order of arguments or use named arguments
+        sheet.update(range_name=f'{sheet_range}{i+1}:{chr(ord(sheet_range)+4)}{i+1}', values=[board[i]])
 
 # Get valid input from the user (Bug Fix)
 def get_valid_input(prompt):
@@ -91,8 +98,13 @@ def play_game():
 
     # Loop until one player wins (all ships of one side are sunk)
     while True:
-        # Show current board state
+        # --- Display current board state ---
         display_boards(player_board, computer_board)
+
+        # Option to view player's ship board
+        show_ships = input("\nDo you want to see your ship board? (y/n): ").lower()
+        if show_ships == "y":
+            display_player_ship_board(player_ship_board)
 
         # --- Player's Turn ---
         print("Your turn:")
@@ -148,6 +160,7 @@ def display_rules():
     3. On your turn, enter the row and column you want to attack (0 to 4).
     4. If you hit an opponent's ship, it's marked with 'X' on your guessing board.
     5. The game continues until all ships are sunk.
+    6. You can view your own ship board during the game by selecting the option.
     """)
 
 # Starting menu
@@ -173,4 +186,3 @@ def start_menu():
 # Run the menu
 if __name__ == '__main__':
     start_menu()
-    
