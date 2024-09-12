@@ -21,19 +21,17 @@ def print_board(board):
     for row in board:
         print(" ".join(row))
 
-# Display the player's and computer's boards side by side
-def display_boards(player_board, computer_board):
-    print("\nPlayer's Guessing Board         Computer's Board")
-    print("----------------------      -----------------")
-    for i in range(5):
-        print(" ".join(player_board[i]) + "                  " + " ".join(computer_board[i]))
+# Display the player's guessing board
+def display_player_guess_board(player_board):
+    print("\nPlayer's Guessing Board")
+    print("----------------------")
+    print_board(player_board)
 
-# Display the player's ship board
-def display_player_ship_board(player_ship_board):
-    print("\nPlayer's Ship Board")
-    print("-------------------")
-    for row in player_ship_board:
-        print(" ".join(row))
+# Display the computer's guessing board (Player's ship board with computer's hits)
+def display_computer_guess_board(player_ship_board):
+    print("\nComputer's Guesses on Your Ship Board")
+    print("------------------------------------")
+    print_board(player_ship_board)
 
 # Place ships randomly on the board
 def place_ships(num_ships=3):
@@ -46,7 +44,6 @@ def place_ships(num_ships=3):
 # Update board in Google Sheet
 def update_sheet(board, sheet_range):
     for i in range(5):
-        # Change the order of arguments or use named arguments
         sheet.update(range_name=f'{sheet_range}{i+1}:{chr(ord(sheet_range)+4)}{i+1}', values=[board[i]])
 
 # Get valid input from the user (Bug Fix)
@@ -68,7 +65,7 @@ def computer_guess():
 # Check if all ships are sunk
 def all_ships_sunk(ships, board):
     for ship_row, ship_col in ships:
-        if board[ship_row][ship_col] != "X":  # Not hit yet
+        if board[ship_row][ship_col] != "H":  # Ship not hit yet
             return False
     return True
 
@@ -98,15 +95,14 @@ def play_game():
 
     # Loop until one player wins (all ships of one side are sunk)
     while True:
-        # --- Display current board state ---
-        display_boards(player_board, computer_board)
+        # --- Player's Turn ---
+        display_player_guess_board(player_board)  # Show player's guess board
 
         # Option to view player's ship board
         show_ships = input("\nDo you want to see your ship board? (y/n): ").lower()
         if show_ships == "y":
-            display_player_ship_board(player_ship_board)
+            display_computer_guess_board(player_ship_board)  # Show player's ship board with hits
 
-        # --- Player's Turn ---
         print("Your turn:")
         guess_row = get_valid_input("Guess Row (0-4): ")
         guess_col = get_valid_input("Guess Col (0-4): ")
@@ -114,14 +110,14 @@ def play_game():
         # Check if the player's guess hits any of the computer's ships
         if (guess_row, guess_col) in computer_ships:
             print("Hit! You sunk part of the computer's ship!")
-            player_board[guess_row][guess_col] = "X"
+            player_board[guess_row][guess_col] = "H"  # Mark hit with "H"
             update_sheet(player_board, 'A')
         else:
-            if player_board[guess_row][guess_col] == "X":
-                print("You already guessed that spot!")
+            if player_board[guess_row][guess_col] == "H":
+                print("You already guessed that spot and hit!")
             else:
                 print("You missed!")
-                player_board[guess_row][guess_col] = "X"
+                player_board[guess_row][guess_col] = "X"  # Mark miss with "X"
                 update_sheet(player_board, 'A')
 
         # Check if player sunk all computer's ships
@@ -132,22 +128,26 @@ def play_game():
         # --- Computer's Turn ---
         print("Computer's turn...")
         comp_guess_row, comp_guess_col = computer_guess()
+        print(f"Computer guessed Row: {comp_guess_row}, Col: {comp_guess_col}")
 
         # Check if the computer's guess hits any of the player's ships
         if (comp_guess_row, comp_guess_col) in player_ships:
             print("The computer hit your ship!")
-            computer_board[comp_guess_row][comp_guess_col] = "X"
-            update_sheet(computer_board, 'G')
+            player_ship_board[comp_guess_row][comp_guess_col] = "H"  # Mark hit with "H"
+            update_sheet(player_ship_board, 'M')
         else:
-            if computer_board[comp_guess_row][comp_guess_col] == "X":
+            if player_ship_board[comp_guess_row][comp_guess_col] == "H":
                 print("Computer guessed the same spot again!")
             else:
                 print("Computer missed!")
-                computer_board[comp_guess_row][comp_guess_col] = "X"
+                computer_board[comp_guess_row][comp_guess_col] = "X"  # Mark miss with "X"
                 update_sheet(computer_board, 'G')
 
+        # Display updated computer's guess board (player's ship board)
+        display_computer_guess_board(player_ship_board)
+
         # Check if computer sunk all player's ships
-        if all_ships_sunk(player_ships, computer_board):
+        if all_ships_sunk(player_ships, player_ship_board):
             print("The computer sunk all your ships!")
             break
 
@@ -158,7 +158,7 @@ def display_rules():
     1. Both the player and the computer have 3 ships hidden on a 5x5 grid.
     2. The goal is to sink all of the opponent's ships before they sink yours.
     3. On your turn, enter the row and column you want to attack (0 to 4).
-    4. If you hit an opponent's ship, it's marked with 'X' on your guessing board.
+    4. If you hit an opponent's ship, it's marked with 'H' on your guessing board.
     5. The game continues until all ships are sunk.
     6. You can view your own ship board during the game by selecting the option.
     """)
