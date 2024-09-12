@@ -36,19 +36,48 @@ def read_board_from_sheet():
     board_data = sheet.get('A1:E5')
     return board_data
 
-#Game logic 
+# Game logic for Battleships
 def play_game():
-    #Max guesses allowed
+    print("Welcome to Battleships!")
+    
+    board = initialize_board()  # Initialize a blank board
+    ship_row, ship_col = place_ship()  # Place a random ship
+    
+    # Save initial board state to Google Sheets
+    update_sheet(board)
+    
+    # Maximum guesses allowed
     max_turns = 5
+
     for turn in range(max_turns):
+        print(f"\nTurn {turn + 1} of {max_turns}")
+        print_board(board)
+        
+        # Get player's guess
         guess_row = int(input("Guess Row (0-4): "))
         guess_col = int(input("Guess Col (0-4): "))
-        # Check if guess is correct and continue the game logic
+        
+        # Check if the guess is correct
+        if guess_row == ship_row and guess_col == ship_col:
+            print("Congratulations! You sunk my battleship!")
+            board[guess_row][guess_col] = "X"
+            update_sheet(board)  # Update the board in Google Sheets
+            break
+        else:
+            if 0 <= guess_row <= 4 and 0 <= guess_col <= 4:
+                if board[guess_row][guess_col] == "X":
+                    print("You already guessed that spot!")
+                else:
+                    print("You missed!")
+                    board[guess_row][guess_col] = "X"
+                    update_sheet(board)  # Update the board in Google Sheets
+            else:
+                print("That's not even in the ocean!")
+        
+        if turn == max_turns - 1:
+            print("Game over! You ran out of turns.")
+            print(f"The ship was at: ({ship_row}, {ship_col})")
 
-#Check if the guess matches the ships location
-if guess_row == ship_row and guess_col == ship_col:
-    print("Congratulations! You sunk my battleship!")
-    break
-else:
-    if turn == max_turns - 1:
-        print(f"Game over! The ship was at ({ship_row}, {ship_col})")
+# Run the game
+if __name__ == '__main__':
+    play_game()
