@@ -22,3 +22,16 @@ def print_board(board):
     for row in board:
         print(" ".join(row))
 
+# Place the ship randomly on the board
+def place_ship():
+    return random.randint(0, 4), random.randint(0, 4)
+
+# Update board in Google Sheet
+def update_sheet(board):
+    for i in range(5):
+        sheet.update(f'A{i+1}:E{i+1}', [board[i]])
+
+# Read board from Google Sheet 
+def read_board_from_sheet():
+    board_data = sheet.get('A1:E5')
+    return board_data
