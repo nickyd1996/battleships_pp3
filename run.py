@@ -36,6 +36,18 @@ def read_board_from_sheet():
     board_data = sheet.get('A1:E5')
     return board_data
 
+# Get valid input from the user 
+def get_valid_input(prompt):
+    while True:
+        try:
+            value = int(input(prompt))
+            if 0 <= value <= 4:
+                return value
+            else:
+                print("Please enter a number between 0 and 4.")
+        except ValueError:
+            print("Invalid input. Please enter a valid integer.")
+
 # Game logic for Battleships
 def play_game():
     print("Welcome to Battleships!")
