@@ -16,14 +16,19 @@ sheet = client.open(SPREADSHEET_NAME).sheet1
 def initialize_board():
     return [['O' for _ in range(5)] for _ in range(5)]
 
-# Print the boards side by side
-def print_boards(player_board, computer_board):
-    print("\nYour Board".ljust(20) + "Computer's Board")
-    print("------------------------------------")
+# Print boards side by side (showing computer's ships on their board)
+def print_boards(player_board, computer_board, computer_ship_board):
+    print("\nYour Guess Board".ljust(40) + "Computer's Board (Ships visible)")
+    print("------------------------------------------------------------")
     for i in range(5):
+        # Display player's guesses on the player's board
         player_row = " ".join(player_board[i])
-        computer_row = " ".join(computer_board[i])
-        print(player_row.ljust(20) + computer_row)
+        # Show the computer's ships on the computer's board
+        computer_row = [
+            "S" if computer_ship_board[i][j] == "S" else computer_board[i][j]
+            for j in range(5)
+        ]
+        print(player_row.ljust(40) + " ".join(computer_row))
 
 # Place ships randomly on the board
 def place_ships(num_ships=3):
@@ -38,7 +43,7 @@ def update_sheet(board, sheet_range):
     for i in range(5):
         sheet.update(range_name=f'{sheet_range}{i+1}:{chr(ord(sheet_range)+4)}{i+1}', values=[board[i]])
 
-# Get valid input from the user (Bug Fix)
+# Get valid input from the user
 def get_valid_input(prompt):
     while True:
         try:
@@ -68,21 +73,19 @@ def play_game():
     # Initialize boards
     player_board = initialize_board()  # Player's guesses
     computer_board = initialize_board()  # Computer's guesses
-    player_ship_board = initialize_board()  # Player's ships
     computer_ship_board = initialize_board()  # Computer's ships
 
     # Place 3 ships for both the player and the computer
     player_ships = place_ships(3)  # Player's 3 ships
     computer_ships = place_ships(3)  # Computer's 3 ships
 
-    # Mark the player's ships on the player board (not shown to the computer)
-    for row, col in player_ships:
-        player_ship_board[row][col] = "S"
+    # Mark the computer's ships on the computer's board (shown to the player)
+    for row, col in computer_ships:
+        computer_ship_board[row][col] = "S"
 
     # Update initial boards to Google Sheets
     update_sheet(player_board, 'A')  # Player's guesses
     update_sheet(computer_board, 'G')  # Computer's guesses
-    update_sheet(player_ship_board, 'M')  # Player's ships
     update_sheet(computer_ship_board, 'S')  # Computer's ships
 
     # Turn limit
@@ -94,7 +97,7 @@ def play_game():
         print(f"\nTurn {turn_count + 1}/{turn_limit}")
 
         # --- Player's Turn ---
-        print_boards(player_board, computer_board)  # Show both boards side by side
+        print_boards(player_board, computer_board, computer_ship_board)  # Show both boards side by side with computer's ships visible
 
         print("\nYour turn:")
         guess_row = get_valid_input("Guess Row (0-4): ")
@@ -126,20 +129,8 @@ def play_game():
         # Check if the computer's guess hits any of the player's ships
         if (comp_guess_row, comp_guess_col) in player_ships:
             print("The computer hit your ship!")
-            player_ship_board[comp_guess_row][comp_guess_col] = "H"  # Mark hit with "H"
-            update_sheet(player_ship_board, 'M')
         else:
-            if player_ship_board[comp_guess_row][comp_guess_col] == "H" or computer_board[comp_guess_row][comp_guess_col] == "X":
-                print("Computer guessed the same spot again!")
-            else:
-                print("Computer missed!")
-                computer_board[comp_guess_row][comp_guess_col] = "X"  # Mark miss with "X"
-                update_sheet(computer_board, 'G')
-
-        # Check if computer sunk all player's ships
-        if all_ships_sunk(player_ships, player_ship_board):
-            print("The computer sunk all your ships!")
-            break
+            print("Computer missed!")
 
         turn_count += 1
 
