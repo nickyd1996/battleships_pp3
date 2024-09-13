@@ -89,7 +89,7 @@ def play_game():
     player_guesses = set()
 
     # Turn limit
-    turn_limit = 10
+    turn_limit = 5
     turn_count = 0
 
     # Loop until all ships are sunk or turn limit is reached
