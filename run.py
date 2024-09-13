@@ -85,6 +85,9 @@ def play_game():
     update_sheet(computer_board, 'G')  # Computer's guesses
     update_sheet(player_ship_board, 'S')  # Player's ship board
 
+    # Track the player's guesses to avoid duplicates
+    player_guesses = set()
+
     # Turn limit
     turn_limit = 10
     turn_count = 0
@@ -97,8 +100,17 @@ def play_game():
         print_boards(player_board, computer_board, player_ship_board)  # Show both boards side by side
 
         print("\nYour turn:")
-        guess_row = get_valid_input("Guess Row (0-4): ")
-        guess_col = get_valid_input("Guess Col (0-4): ")
+
+        # Get player's guess and validate it hasn't been guessed before
+        while True:
+            guess_row = get_valid_input("Guess Row (0-4): ")
+            guess_col = get_valid_input("Guess Col (0-4): ")
+
+            if (guess_row, guess_col) in player_guesses:
+                print("You've already guessed that spot. Try again.")
+            else:
+                player_guesses.add((guess_row, guess_col))
+                break
 
         # Check if the player's guess hits any of the computer's ships
         if (guess_row, guess_col) in computer_ships:
@@ -151,6 +163,21 @@ def play_game():
     if turn_count == turn_limit:
         print("\nThe game has reached the maximum turn limit!")
         print("It's a draw!")
+
+    # Ask the player if they want to restart the game
+    restart_game()
+
+# Function to ask if the player wants to restart the game
+def restart_game():
+    while True:
+        choice = input("\nDo you want to play again? (y/n): ").lower()
+        if choice == 'y':
+            play_game()  # Restart the game
+        elif choice == 'n':
+            print("Thanks for playing! Goodbye.")
+            sys.exit()  # Exit the game
+        else:
+            print("Invalid choice. Please enter 'y' for yes or 'n' for no.")
 
 # Function to display the game rules
 def display_rules():
