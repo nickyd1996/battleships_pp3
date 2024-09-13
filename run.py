@@ -16,14 +16,14 @@ sheet = client.open(SPREADSHEET_NAME).sheet1
 def initialize_board():
     return [['O' for _ in range(5)] for _ in range(5)]
 
-# Print boards side by side (showing computer's ships on their board)
+# Print boards side by side (showing computer's hits on their own board)
 def print_boards(player_board, computer_board, computer_ship_board):
-    print("\nYour Guess Board".ljust(40) + "Computer's Board (Ships visible)")
+    print("\nYour Guess Board".ljust(40) + "Computer's Board (Showing Hits/Misses)")
     print("------------------------------------------------------------")
     for i in range(5):
         # Display player's guesses on the player's board
         player_row = " ".join(player_board[i])
-        # Show the computer's ships on the computer's board
+        # Show the computer's ships and the places it has hit/missed on its own board
         computer_row = [
             "S" if computer_ship_board[i][j] == "S" else computer_board[i][j]
             for j in range(5)
@@ -73,6 +73,7 @@ def play_game():
     # Initialize boards
     player_board = initialize_board()  # Player's guesses
     computer_board = initialize_board()  # Computer's guesses
+    player_ship_board = initialize_board()  # Player's ships
     computer_ship_board = initialize_board()  # Computer's ships
 
     # Place 3 ships for both the player and the computer
@@ -97,7 +98,7 @@ def play_game():
         print(f"\nTurn {turn_count + 1}/{turn_limit}")
 
         # --- Player's Turn ---
-        print_boards(player_board, computer_board, computer_ship_board)  # Show both boards side by side with computer's ships visible
+        print_boards(player_board, computer_board, computer_ship_board)  # Show both boards side by side with computer's hits/misses visible
 
         print("\nYour turn:")
         guess_row = get_valid_input("Guess Row (0-4): ")
@@ -129,8 +130,20 @@ def play_game():
         # Check if the computer's guess hits any of the player's ships
         if (comp_guess_row, comp_guess_col) in player_ships:
             print("The computer hit your ship!")
+            computer_board[comp_guess_row][comp_guess_col] = "H"  # Mark hit with "H"
+            update_sheet(computer_board, 'G')
         else:
-            print("Computer missed!")
+            if computer_board[comp_guess_row][comp_guess_col] == "H" or computer_board[comp_guess_row][comp_guess_col] == "X":
+                print("Computer guessed the same spot again!")
+            else:
+                print("Computer missed!")
+                computer_board[comp_guess_row][comp_guess_col] = "X"  # Mark miss with "X"
+                update_sheet(computer_board, 'G')
+
+        # Check if computer sunk all player's ships
+        if all_ships_sunk(player_ships, player_ship_board):
+            print("The computer sunk all your ships!")
+            break
 
         turn_count += 1
 
