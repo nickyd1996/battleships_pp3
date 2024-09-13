@@ -16,22 +16,14 @@ sheet = client.open(SPREADSHEET_NAME).sheet1
 def initialize_board():
     return [['O' for _ in range(5)] for _ in range(5)]
 
-# Print the board
-def print_board(board):
-    for row in board:
-        print(" ".join(row))
-
-# Display the player's guessing board
-def display_player_guess_board(player_board):
-    print("\nPlayer's Guessing Board")
-    print("----------------------")
-    print_board(player_board)
-
-# Display the computer's guessing board (Player's ship board with computer's hits)
-def display_computer_guess_board(player_ship_board):
-    print("\nComputer's Guesses on Your Ship Board")
+# Print the boards side by side
+def print_boards(player_board, computer_board):
+    print("\nYour Board".ljust(20) + "Computer's Board")
     print("------------------------------------")
-    print_board(player_ship_board)
+    for i in range(5):
+        player_row = " ".join(player_board[i])
+        computer_row = " ".join(computer_board[i])
+        print(player_row.ljust(20) + computer_row)
 
 # Place ships randomly on the board
 def place_ships(num_ships=3):
@@ -72,7 +64,7 @@ def all_ships_sunk(ships, board):
 # Game logic for Battleships (Player vs Computer)
 def play_game():
     print("Starting the Battleships game: Player vs Computer!")
-
+    
     # Initialize boards
     player_board = initialize_board()  # Player's guesses
     computer_board = initialize_board()  # Computer's guesses
@@ -93,17 +85,18 @@ def play_game():
     update_sheet(player_ship_board, 'M')  # Player's ships
     update_sheet(computer_ship_board, 'S')  # Computer's ships
 
-    # Loop until one player wins (all ships of one side are sunk)
-    while True:
+    # Turn limit
+    turn_limit = 10
+    turn_count = 0
+
+    # Loop until all ships are sunk or turn limit is reached
+    while turn_count < turn_limit:
+        print(f"\nTurn {turn_count + 1}/{turn_limit}")
+
         # --- Player's Turn ---
-        display_player_guess_board(player_board)  # Show player's guess board
+        print_boards(player_board, computer_board)  # Show both boards side by side
 
-        # Option to view player's ship board
-        show_ships = input("\nDo you want to see your ship board? (y/n): ").lower()
-        if show_ships == "y":
-            display_computer_guess_board(player_ship_board)  # Show player's ship board with hits
-
-        print("Your turn:")
+        print("\nYour turn:")
         guess_row = get_valid_input("Guess Row (0-4): ")
         guess_col = get_valid_input("Guess Col (0-4): ")
 
@@ -113,8 +106,8 @@ def play_game():
             player_board[guess_row][guess_col] = "H"  # Mark hit with "H"
             update_sheet(player_board, 'A')
         else:
-            if player_board[guess_row][guess_col] == "H":
-                print("You already guessed that spot and hit!")
+            if player_board[guess_row][guess_col] == "H" or player_board[guess_row][guess_col] == "X":
+                print("You already guessed that spot!")
             else:
                 print("You missed!")
                 player_board[guess_row][guess_col] = "X"  # Mark miss with "X"
@@ -136,20 +129,24 @@ def play_game():
             player_ship_board[comp_guess_row][comp_guess_col] = "H"  # Mark hit with "H"
             update_sheet(player_ship_board, 'M')
         else:
-            if player_ship_board[comp_guess_row][comp_guess_col] == "H":
+            if player_ship_board[comp_guess_row][comp_guess_col] == "H" or computer_board[comp_guess_row][comp_guess_col] == "X":
                 print("Computer guessed the same spot again!")
             else:
                 print("Computer missed!")
                 computer_board[comp_guess_row][comp_guess_col] = "X"  # Mark miss with "X"
                 update_sheet(computer_board, 'G')
 
-        # Display updated computer's guess board (player's ship board)
-        display_computer_guess_board(player_ship_board)
-
         # Check if computer sunk all player's ships
         if all_ships_sunk(player_ships, player_ship_board):
             print("The computer sunk all your ships!")
             break
+
+        turn_count += 1
+
+    # If the turn limit is reached without a winner
+    if turn_count == turn_limit:
+        print("\nThe game has reached the maximum turn limit!")
+        print("It's a draw!")
 
 # Function to display the game rules
 def display_rules():
@@ -159,8 +156,8 @@ def display_rules():
     2. The goal is to sink all of the opponent's ships before they sink yours.
     3. On your turn, enter the row and column you want to attack (0 to 4).
     4. If you hit an opponent's ship, it's marked with 'H' on your guessing board.
-    5. The game continues until all ships are sunk.
-    6. You can view your own ship board during the game by selecting the option.
+    5. The game continues for a maximum of 10 turns or until all ships are sunk.
+    6. The game ends in a draw if neither side sinks all ships within 10 turns.
     """)
 
 # Starting menu
