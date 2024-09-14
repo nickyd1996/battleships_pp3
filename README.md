@@ -1,14 +1,14 @@
-# Hangman
+# Battleships
 
-Hangman is a classic and popular online word guessing game that can be enjoyed by players of all ages. The game begins with the user having the option to read the rules or create a username and select a difficulty level, ranging from easy to hard.
+Battleships is a classic and popular strategy game that can be enjoyed by players of all ages. The game begins with the user having the option to read the rules or start the game or quit. 
 
-Once the game has started, the user is prompted to guess a letter, and if they are correct, a message will indicate the correct letter placement, and the gallows and previously guessed letters will be displayed. However, if the user guesses incorrectly, they will receive an incorrect message and the gallows will be updated with a penalty, moving them one step closer to losing the game.
+Once the game has started, the user is prompted to guess a a coordinate of where the opposing players ships might be, and if they are correct, a message will indicate they hit the ship and this will represent an H on the board. However, if the user guesses incorrectly, they will receive a message to say that they missed and it is represented with an x on the board. 
 
-Overall, Hangman is a fun and challenging game that requires both guessing skills and vocabulary knowledge, making it a great way to test your abilities and have fun at the same time.
+Overall, battleships is a fun and challenging game that requires good guessing skills and planning, making it a great way to test your abilities and have fun at the same time.
 
-![Home Screen](/readme_images/home_screen.PNG)
+![Home Screen](/assets/images/start-page.png)
 
-[View Hangman live project here](https://hangmans-noose.herokuapp.com/)
+[View Hangman live project here](https://battleshipspp3-28-c593d68c5099.herokuapp.com/)
 - - -
 
 ## Table of Contents
@@ -38,46 +38,36 @@ Overall, Hangman is a fun and challenging game that requires both guessing skill
 
 ## How to Play
 
-In this implementation of Hangman, you will play against the computer. 
-You will be prompted to choose a difficulty level (easy, medium, or hard), and the computer will randomly select a word from a list of words corresponding to that level. 
-You will then have to guess the letters in the chosen word before the hangman is complete.
+    1. Both the player and the computer have 3 ships hidden on a 5x5 grid.
+    2. The goal is to sink all of the opponent's ships before they sink yours.
+    3. On your turn, enter the row and column you want to attack (0 to 4).
+    4. If you hit opponent's ship, it's marked with 'H' on your guessing board.
+    5. The game continues for a maximum of 5 turns or until ships are sunk.
+    6. The game ends in a draw if neither side sinks all ships within 5 turns.
 
 ## Logic flowchart
 
-![Flowchart](/readme_images/hangman_flowchart.PNG)
+![Flowchart](/assets/images/flowchart.png)
 
 ## User Experience (UX)
 
-Hangman is a classic word guessing game that provides a simple yet entertaining user experience. The user is presented with a blank series of dashes that represent the letters of a mystery word. They have to guess the letters in the word, one at a time. With each correct guess, the letter is revealed in the corresponding position(s). However, with each incorrect guess, a part of a hangman's body is drawn. The user can guess until they either correctly guess the entire word or the hangman is fully drawn, resulting in a loss. The game is easy to learn and provides a good balance of challenge and reward. It is also a great way to improve vocabulary and spelling skills while having fun.
+Battleship is a fun engaging game where the user plays against the computer to sink the computer ships. The user has 5 tries to sink all the computer ships. If the player sinks all the ships they win the game and if the computer sinks all the ships they wion the game.
 
 ### User Stories
 
-* First-time visitor goals
+* Visitor goals
     * Understand how the game works. Clear instructions and what the objective of the game is.
     * Play the game. Once the user understands the game, they will likely want to play it.
-    * Enjoy the experience. The hangman game should be engaging and fun for the user.
-
-* Returning visitor goals
-    * Continue playing. The returning visitor may have enjoyed playing the game and wants to play again.
-    * Share with friends. Inviting friends to give the game a try.
-    * Exploring new features, if there is any.
-
-* Frequent user goals
-    * Improving their speed and accuracy in guessing words.
-    * Increasing the difficulty level of the game to challenge themselves.
-    * Sharing the game with others or inviting friends to play.
-    * Exploring new features, if there is any.
+    * Enjoy the experience.
 
 ---
 
 ## Features
 
-* Word selection. The game randomly selects a word from one of the three available predefined lists of words.
-* Difficulty settings. The game offers three difficulty settings, easy, medium and hard.
+* ship positioning. The game randomly positions the ship within the players board.
 * Visual interface. Appealing interface that is easy to navigate and understand.
-* Letter input. User can input their guess letter by letter to guess the hidden word.
-* Incorrect guess tracking. Visually drawing a part of the hangman figure.
-* Win or loss detection. Detect when the player has either successfully guessed the entire word or made too many incorrect guesses and lost the game.
+* Number input. User can input their guess number to guess the ships position.
+* Win or loss detection. Detect when the player has either successfully guessed the position of the ship or made too many incorrect guesses and lost the game.
 * Play again at the end of the game.
 
 ### Existing Features
@@ -108,23 +98,16 @@ Hangman is a classic word guessing game that provides a simple yet entertaining 
 ![Correct guess](/assets/images/ship-hit.png)
 
 * Incorrect Guess
-    * If letter is not guessed, "Incorrect" message displays red.
+    * If ship is misses, message displays that you missed.
 
-![Incorrect guess](/readme_images/incorrect_guess.PNG)
+![Incorrect guess](/assets/images/missed.png)
 
-* User guesses the word correctly
-    * Message that confirms hangman is beaten.
-
-![Won game](/readme_images/win.PNG)
 
 * User is out of guesses
-    * Message that confirms a lost game.
+    * Message that game is over.
 
-![Lose](/readme_images/lose.PNG)
+![Lose](/assets/images/restart-game.png)
 
-* Play again
-
-![Play again](/readme_images/play_again.PNG)
 
 ## Features Left to Implement
 
