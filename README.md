@@ -83,31 +83,29 @@ Hangman is a classic word guessing game that provides a simple yet entertaining 
 ### Existing Features
 
 * Intro screen
-    * Displays logo and a welcome message.
+    * Displays a welcome message.
 
-![Intro Screen](/readme_images/intro.PNG)
+![Intro Screen](/assets/images/game-start.png)
 
 * Rules
-    * User can choose to display rules or skip them using "y" or "n".
+    * User can choose to display rules ny choosing option "1".
 
-![Rules](/readme_images/rules.PNG)
+![Rules](/assets/images/rule-page.png)
 
-* Enter a username
+* Start the game
+    *Users can choose to start the game by choosing "2"
 
-![Username](/readme_images/username.PNG)
+![Username](/assets/images/game-start.png)
 
-* Introduction message and difficulty setting
 
-![Difficulty Setting](/readme_images/difficulty_setting.PNG)
+* Prompt user to start the game
 
-* Promp user to make a guess
+![Guess a coordinate](/assets/images/game-start.png)
 
-![Guess a letter](/readme_images/guess_a_letter.PNG)
+* Ship Hit
+    * If you hit a ship, this message pops up.
 
-* Correct Guess
-    * If letter is guessed, "Correct" message displays green.
-
-![Correct guess](/readme_images/correct_guess.PNG)
+![Correct guess](/assets/images/ship-hit.png)
 
 * Incorrect Guess
     * If letter is not guessed, "Incorrect" message displays red.
@@ -130,9 +128,8 @@ Hangman is a classic word guessing game that provides a simple yet entertaining 
 
 ## Features Left to Implement
 
-* Additional words might be available.
-* Different word topics
-* Scoring system
+* Creating a username for returning players
+* High scoring systems
 * Two player option
 
 ---
@@ -140,10 +137,8 @@ Hangman is a classic word guessing game that provides a simple yet entertaining 
 ## Design
 
 * Colors
-    * dark-orange
-    * orange-red
-    * red
-    * green
+    * White
+    * Black
 
 * Flowchart
     * [Draw.io](http://draw.io/)
@@ -158,10 +153,6 @@ Hangman is a classic word guessing game that provides a simple yet entertaining 
 
 ## Frameworks, Libraries & Programs Used
 
-* [Codeanywhere](https://app.codeanywhere.com/)
-    * To write the code.
-* [Git](https://git-scm.com/)
-    * for version control.
 * [Github](https://github.com/)
     * Deployment of the website and storing the files online.
 * [Draw.io](http://draw.io/)
@@ -179,22 +170,10 @@ CI Python Linter was used to test run.py, colors.py and hangman_art_words.py
 <summary> run.py CI Python Linter check
 </summary>
 
-![run.py linter check](/readme_images/run_linter_check.PNG)
+![run.py linter check](/assets/images/ci-python-linter-test.png)
 </details>
 
-<details>
-<summary> colors.py CI Python Linter check
-</summary>
 
-![run.py linter check](/readme_images/colors_linter_check.PNG)
-</details>
-
-<details>
-<summary> hangman_art_words.py CI Python Linter check
-</summary>
-
-![run.py linter check](/readme_images/hangman_art_words_linter_check.PNG)
-</details>
 
 ## Manual Testing
 

@@ -4,7 +4,8 @@ import random
 import sys
 
 # Google Sheets setup
-SCOPE = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+SCOPE = ["https://spreadsheets.google.com/feeds",
+         "https://www.googleapis.com/auth/drive"]
 CREDS_FILE = 'creds.json'
 SPREADSHEET_NAME = 'BattleshipsPP3'
 
@@ -13,12 +14,17 @@ client = gspread.authorize(credentials)
 sheet = client.open(SPREADSHEET_NAME).sheet1
 
 # Initialize the board
+
+
 def initialize_board():
     return [['O' for _ in range(5)] for _ in range(5)]
 
 # Print boards side by side (showing hits/misses on both boards)
+
+
 def print_boards(player_board, computer_board, player_ship_board):
-    print("\nYour Guess Board".ljust(40) + "Computer's Guess Board (Showing Hits/Misses)")
+    print("\nYour Guess Board".ljust(40)
+          + "Computer's Guess Board (Showing Hits/Misses)")
     print("------------------------------------------------------------")
     for i in range(5):
         # Display player's guesses on the player's board
@@ -28,6 +34,8 @@ def print_boards(player_board, computer_board, player_ship_board):
         print(player_row.ljust(40) + computer_row)
 
 # Place ships randomly on the board
+
+
 def place_ships(num_ships=3):
     ships = set()
     while len(ships) < num_ships:
@@ -36,11 +44,16 @@ def place_ships(num_ships=3):
     return list(ships)
 
 # Update board in Google Sheet
+
+
 def update_sheet(board, sheet_range):
     for i in range(5):
-        sheet.update(range_name=f'{sheet_range}{i+1}:{chr(ord(sheet_range)+4)}{i+1}', values=[board[i]])
+        sheet.update(
+            range_name=f'{sheet_range}{i+1}:{chr(ord(sheet_range)+4)}{i+1}', values=[board[i]])
 
 # Get valid input from the user
+
+
 def get_valid_input(prompt):
     while True:
         try:
@@ -53,10 +66,14 @@ def get_valid_input(prompt):
             print("Invalid input. Please enter a valid integer.")
 
 # Random guess for computer player
+
+
 def computer_guess():
     return random.randint(0, 4), random.randint(0, 4)
 
 # Check if all ships are sunk
+
+
 def all_ships_sunk(ships, board):
     for ship_row, ship_col in ships:
         if board[ship_row][ship_col] != "H":  # Ship not hit yet
@@ -64,13 +81,17 @@ def all_ships_sunk(ships, board):
     return True
 
 # Game logic for Battleships (Player vs Computer)
+
+
 def play_game():
     print("Starting the Battleships game: Player vs Computer!")
-    
     # Initialize boards
-    player_board = initialize_board()  # Player's guesses
-    computer_board = initialize_board()  # Computer's guesses
-    player_ship_board = initialize_board()  # Player's ships (showing hits from the computer)
+    # Player's guesses
+    player_board = initialize_board()
+    # Computer's guesses
+    computer_board = initialize_board()
+    # Player's ships (showing hits from the computer)
+    player_ship_board = initialize_board()
 
     # Place 3 ships for both the player and the computer
     player_ships = place_ships(3)  # Player's 3 ships
@@ -97,7 +118,8 @@ def play_game():
         print(f"\nTurn {turn_count + 1}/{turn_limit}")
 
         # --- Player's Turn ---
-        print_boards(player_board, computer_board, player_ship_board)  # Show both boards side by side
+        # Show both boards side by side
+        print_boards(player_board, computer_board, player_ship_board)
 
         print("\nYour turn:")
 
@@ -138,15 +160,19 @@ def play_game():
         # Check if the computer's guess hits any of the player's ships
         if (comp_guess_row, comp_guess_col) in player_ships:
             print("The computer hit your ship!")
-            computer_board[comp_guess_row][comp_guess_col] = "H"  # Mark hit on computer's board
-            player_ship_board[comp_guess_row][comp_guess_col] = "H"  # Mark hit on player's board (computer's hit)
+            # Mark hit on computer's board
+            computer_board[comp_guess_row][comp_guess_col] = "H"
+            # Mark hit on player's board (computer's hit)
+            player_ship_board[comp_guess_row][comp_guess_col] = "H"
         else:
             if computer_board[comp_guess_row][comp_guess_col] == "H" or computer_board[comp_guess_row][comp_guess_col] == "X":
                 print("Computer guessed the same spot again!")
             else:
                 print("Computer missed!")
-                computer_board[comp_guess_row][comp_guess_col] = "X"  # Mark miss on computer's board
-                player_ship_board[comp_guess_row][comp_guess_col] = "X"  # Mark miss on player's board (computer's guess)
+                # Mark miss on computer's board
+                computer_board[comp_guess_row][comp_guess_col] = "X"
+                # Mark miss on player's board (computer's guess)
+                player_ship_board[comp_guess_row][comp_guess_col] = "X"
 
         # Update both boards in Google Sheets
         update_sheet(computer_board, 'G')
@@ -168,6 +194,8 @@ def play_game():
     restart_game()
 
 # Function to ask if the player wants to restart the game
+
+
 def restart_game():
     while True:
         choice = input("\nDo you want to play again? (y/n): ").lower()
@@ -180,18 +208,22 @@ def restart_game():
             print("Invalid choice. Please enter 'y' for yes or 'n' for no.")
 
 # Function to display the game rules
+
+
 def display_rules():
     print("""
     --- Battleships Game Rules ---
     1. Both the player and the computer have 3 ships hidden on a 5x5 grid.
     2. The goal is to sink all of the opponent's ships before they sink yours.
     3. On your turn, enter the row and column you want to attack (0 to 4).
-    4. If you hit an opponent's ship, it's marked with 'H' on your guessing board.
-    5. The game continues for a maximum of 10 turns or until all ships are sunk.
-    6. The game ends in a draw if neither side sinks all ships within 10 turns.
+    4. If you hit opponent's ship, it's marked with 'H' on your guessing board.
+    5. The game continues for a maximum of 5 turns or until ships are sunk.
+    6. The game ends in a draw if neither side sinks all ships within 5 turns.
     """)
 
 # Starting menu
+
+
 def start_menu():
     while True:
         print("\nWelcome to Battleships!")
@@ -212,5 +244,7 @@ def start_menu():
             print("Invalid input, please enter 1, 2, or 3.")
 
 # Run the menu
+
+
 if __name__ == '__main__':
     start_menu()
